@@ -3,7 +3,7 @@
 并且通过邮件的方式发送卡密，保证安全
 
 ## 技术选型
-> SpringBoot，MySQL，MybatisPlus，vue3
+> SpringBoot, MySQL, MybatisPlus, vue3, SpringBoot整合邮件服务
 
 # Docker部署
 ## 前置工作
