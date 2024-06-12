@@ -31,11 +31,6 @@ public class LanTuPaySignUtil {
     //商户密钥
     private static String key;
 
-    //public static  String mchId = "1668330966";
-    //public static final String notifyUrl = "https://43g8009n65.yicp.fun/wxpay/pay.action";
-    //public static final String notifyUrl = "http://47.108.218.73:65507/wxpay/pay.action";
-    //public static final String key = "4037f0af9c6d03476bb8bf69d53d4835";
-
     @Autowired
     public LanTuPaySignUtil(LanTuPayConfig lanTuPayConfig) {
         mchId = lanTuPayConfig.getMchId();
