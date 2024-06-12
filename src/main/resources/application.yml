@@ -57,8 +57,8 @@ spring:
             drop-table-allow: false
             #select-all-column-allow: false #不允许“select * from xxx”
   mail:
-    # 配置 SMTP 服务器地址【这里示例qq邮箱，自行修改即可，如果使用谷歌邮箱，同时项目部署在国内服务器上，可能会出现邮件发送失败的情况】
-    host: smtp.qq.com
+    # 配置 SMTP 服务器地址【自行修改即可，如果使用谷歌邮箱，同时项目部署在国内服务器上，可能会出现邮件发送失败的情况】
+    host: Fill in your own information
     # 发送者邮箱
     username: Fill in your own information
     # 配置密码，注意不是真正的密码，而是刚刚申请到的授权码
