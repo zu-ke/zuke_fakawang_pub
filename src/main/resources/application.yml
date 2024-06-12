@@ -1,0 +1,110 @@
+#配置静态资源访问路径，防止和controller的url冲突
+spring:
+  mvc:
+    static-path-pattern: /**
+    hiddenmethod:
+      filter:
+        #启用了HiddenHttpMethodFiler过滤器，支持rest风格（表单）
+        enabled: true
+    #配置视图解析器
+    view:
+      suffix: .html
+      prefix: /
+  web:
+    resources:
+      #指定静态资源访问的位置，如果我自己配置了这个静态资源，那么其他路径就失效了，所以干脆直接把原来的也重新配置一遍
+      static-locations: [
+        "classpath:/static/",
+        "classpath:/public/",
+        "classpath:/resources/",
+        "classpath:/META-INF/resources/" ]
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+      enabled: true
+
+  #配置数据源，如果没有指定useSSL=true，启动的时候会爆红，但是没有影响
+  datasource:
+    url: jdbc:mysql://47.108.218.73:65503/fakawang?useSSL=true&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: GEfSuDyTeu7MvZyc
+
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      stat-view-servlet:
+        enabled: true
+        login-username: Fill in your own information
+        login-password: Fill in your own information
+        reset-enable: false
+      #配置web监控
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ioc,/druid/*"
+      filter:
+        #配置sql监控
+        stat:
+          #单位秒，我设定为超过1秒则是慢查询
+          slow-sql-millis: 1000
+          #启用慢查询日志
+          log-slow-sql: true
+        #配置sql防火墙
+        wall:
+          enabled: true
+          config:
+            #禁止删除表
+            drop-table-allow: false
+            #select-all-column-allow: false #不允许“select * from xxx”
+  mail:
+    # 配置 SMTP 服务器地址【这里示例qq邮箱，自行修改即可，如果使用谷歌邮箱，同时项目部署在国内服务器上，可能会出现邮件发送失败的情况】
+    host: smtp.qq.com
+    # 发送者邮箱
+    username: Fill in your own information
+    # 配置密码，注意不是真正的密码，而是刚刚申请到的授权码
+    password: Fill in your own information
+    default-encoding: UTF-8
+    port: 587
+server:
+  port: 8088
+  tomcat:
+    threads:
+      #最大工作线程，默认是200
+      max: 200
+      #最小工作线程，默认是10
+      min-spare: 10
+    #tomcat启动的线程达到最大值后，排队的请求个数，默认是100
+    accept-count: 200
+    #最大连接数，最大并发数
+    max-connections: 2000
+    #建立连接的超时时间，单位毫秒，这里设置10秒
+    connection-timeout: 10000
+mybatis-plus:
+  configuration:
+    #日志
+    #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #自动驼峰配置
+    map-underscore-to-camel-case: true
+# 易支付参数
+yipay:
+  ID: Fill in your own information
+  key: Fill in your own information
+  base_url: Fill in your own information
+  # 【这个参数不用修改】
+  pay_type: wxpay
+  notify_url: https://服务器ip:65507/notify_url.php
+  return_url: https://服务器ip:65507/return_url.php
+  device: pc
+  sign_type: MD5
+  api_url: Fill in your own information
+# 蓝兔支付相关参数
+lantu:
+  # 商户id
+  mchId: Fill in your own information
+  # 回调地址，修改ip(域名)和端口即可
+  notifyUrl: Fill in your own information
+  # 商户密钥
+  key: Fill in your own information
+zk:
+  # 注册后台账户的邀请码
+  yqm: zkfkw2024131

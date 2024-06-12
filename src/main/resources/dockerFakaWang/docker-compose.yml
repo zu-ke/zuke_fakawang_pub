@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql8.0
+    ports:
+      - "65534:3306"
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: 123456
+    volumes:
+      - "./mysql/conf:/etc/mysql/conf.d"
+      - "./mysql/data:/var/lib/mysql"
+      - "./mysql/init:/docker-entrypoint-initdb.d"
+    networks:
+      - new
+  fakawang:
+    build:
+      context: ../../../..
+      dockerfile: Dockerfile
+    container_name: fakawang
+    ports:
+      - "8088:8088"
+    networks:
+      - new
+    depends_on:
+      - mysql
+networks:
+  new:

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>springboot使用拦截器interceptor - 租客书屋</title>
+  <style>
+    *{padding:0;margin:0}
+    a{text-decoration:none;cursor:pointer;color:#333}
+    a:hover{color:#e91e63}
+    body,html{line-height:1;font-family:Helvetica Neue,Helvetica,PingFang SC,Tahoma,Hiragino Sans GB,Heiti SC,Arial,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;font-size:14px}
+    body{background:#fff;font-weight:400;color:#333;text-rendering:optimizelegibility;font-feature-settings:"kern";-webkit-font-feature-settings:"kern";-moz-font-feature-settings:"kern";-o-font-feature-settings:"kern";-webkit-text-size-adjust:none;-moz-text-size-adjust:none;-ms-text-size-adjust:none;text-size-adjust:none;-webkit-tap-highlight-color:transparent;-webkit-tap-highlight-color:transparent;position:fixed;width:100%;min-height:100%}
+    header{position:relative;width:100%;height:360px;background:url(bg.png) no-repeat;background-size:100% 100%;margin-right:.18rem}
+    .face{border-radius:50%;overflow:hidden;width:160px;height:160px;margin-left:-80px;position:absolute;top:40px;left:50%}
+    .face img{width:100%;height:100%}
+    .title{text-align:center;font-size:26px;position:absolute;width:100%;top:220px}
+    .title a{color:#fff}
+    .info{text-align:center;color:#c9c9c9;font-size:16px;position:absolute;width:100%;top:260px}
+    .list{padding:20px}
+    .item{margin-bottom:20px;box-sizing:border-box;background-color:#fff;border:1px solid #e5e8ed;padding:32px;box-shadow:0 2px 4px 0 rgb(3 27 78 / 6%)}
+    .item-title{font-size:28px;margin-bottom:18px}
+    .item-info{color:#999}
+    .item-info-time{float:left;display:inline-block;padding-right:10px}
+    .item-text{padding-top:20px}
+    footer{padding-bottom:9999px;background:#b4c3cf;margin-bottom:-9999px}
+    .url{text-align:center;padding:20px 0}
+    .url a{text-align:center;padding:0 10px}
+  </style>
+</head>
+<body>
+<header>
+  <div class="face">
+    <a href="index.html" title="租客书屋"><img src="face.webp"></a>
+  </div>
+  <div class="title">
+    <a href="index.html" title="租客书屋">租客书屋</a></div>
+  <div class="info">一只不断学习中的程序猿</div>
+</header>
+<div class="list">
+  <div class="item">
+    <div class="item-title">
+      <a href="index.html" title="从今天开始记录！">springboot使用拦截器interceptor</a>
+    </div>
+    <div class="item-info">
+      <div class="item-info-time">时间:2024年03月14日 16:54:27</div>
+      <div class="item-info-user">作者:租客</div>
+    </div>
+    <div class="item-text">
+      <pre>
+        public class WebConfig implements WebMvcConfigurer {
+          @Override
+          public void addInterceptors(InterceptorRegistry registry) {
+            registry.addInterceptor(new LoginInterceptor()).addPathPatterns("/**").excludePathPatterns("/","/login","/images/**","/upload.html","/upload");
+          }
+        }
+      </pre>
+    </div>
+  </div>
+</div>
+<footer>
+  <div class="url">
+    <a href="index.html">租客书屋</a>
+    <a href="https://beian.miit.gov.cn" target="_blank">滇ICP备2024019869号</a>
+  </div>
+</footer>
+</body>
+</html>
