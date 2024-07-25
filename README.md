@@ -2,6 +2,13 @@
 > 售卖卡密等类似商品，对接蓝兔支付平台或者易支付平台，自动收款到账，
 并且通过邮件的方式发送卡密，保证安全
 
+## 界面展示
+![QQ_1721892564742](https://imgbed.zukedog.cn/i/2024/07/25/p9eer3.png)
+![QQ_1721892598667](https://imgbed.zukedog.cn/i/2024/07/25/p9siiu.png)
+![QQ_1721892628859](https://imgbed.zukedog.cn/i/2024/07/25/p9yu4g.png)
+![QQ_1721892640717](https://imgbed.zukedog.cn/i/2024/07/25/pa1c41.png)
+
+
 ## 技术选型
 > SpringBoot, MySQL, MybatisPlus, vue3, SpringBoot整合邮件服务
 
