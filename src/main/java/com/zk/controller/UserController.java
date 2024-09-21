@@ -21,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -154,54 +155,99 @@ public class UserController {
     * */
     @PostMapping("/wxpay/pay.action")
     @ResponseBody
+    @Transactional
     public ResponseEntity<String> notify_LanTu(@RequestParam Map<String, String> map) {
-        log.info("notify_ = " + map);
+        log.info("支付回调参数：{}", map);
         try {
             String email = map.get("attach");
-            //log.info(email);
-            if ("0".equals(map.get("code"))) {
-                UpdateWrapper<Order_> getWrapper = new UpdateWrapper<>();
-                getWrapper.eq("out_trade_no", map.get("out_trade_no"));
-                getWrapper.eq("status", 1);
-                Order_ one = orderService.getOne(getWrapper);
-                //System.out.println("one = " + one);
-                log.info("one = " + one);
-                if (null != one) {
-                    return ResponseEntity.ok("SUCCESS"); // 返回状态码200和文本"SUCCESS"
-                }
-                String money = map.get("total_fee");
-                QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
-                queryWrapper.orderByDesc("id");
-                queryWrapper.last("limit 1");
-                queryWrapper.select("id", "gpt_key", "category_id");
-                queryWrapper.eq("price", money);
-                Product product = productService.getOne(queryWrapper);
-                if (product != null) {
-                    utils.sendEmail(email, product.getGptKey());
-                    UpdateWrapper<Order_> updateWrapper = new UpdateWrapper<>();
-                    updateWrapper.eq("out_trade_no", map.get("out_trade_no"));
-                    Order_ order = new Order_();
-                    order.setProductId(product.getGptKey());
-                    order.setStatus("1");
-                    order.setTradeStatus(map.get("code"));
-                    order.setTradeNo(map.get("order_no"));
-                    orderService.update(order, updateWrapper);
-                    UpdateWrapper<Category> updateWrapper1 = new UpdateWrapper<>();
-                    updateWrapper1.eq("id", product.getCategoryId()).setSql("stock = stock - 1");
-                    categoryService.update(updateWrapper1);
-                    productService.removeById(product.getId());
-                    return ResponseEntity.ok("SUCCESS"); // 返回状态码200和文本"SUCCESS"
-                } else {
+            String code = map.get("code");
+            String outTradeNo = map.get("out_trade_no");
+            String totalFee = map.get("total_fee");
+
+            // 参数校验
+            if (email == null || code == null || outTradeNo == null) {
+                log.warn("支付回调参数缺失");
+                return ResponseEntity.badRequest().body("Invalid parameters");
+            }
+
+            // 检查订单是否已处理
+            Order_ existingOrder = orderService.getOne(new QueryWrapper<Order_>()
+                    .eq("out_trade_no", outTradeNo)
+                    .eq("status", 1));
+            if (existingOrder != null) {
+                log.info("订单已处理，订单号：{}", outTradeNo);
+                return ResponseEntity.ok("SUCCESS");
+            }
+
+            if ("0".equals(code)) {
+                // **支付成功的处理**
+
+                // 获取商品信息
+                BigDecimal money = new BigDecimal(totalFee);
+                Product product = productService.getOne(new QueryWrapper<Product>()
+                        .eq("price", money)
+                        .orderByDesc("id")
+                        .last("limit 1")
+                        .select("id", "gpt_key", "category_id"));
+
+                if (product == null) {
+                    log.warn("未找到对应价格的商品，金额：{}", money);
+                    // 发送支付失败的邮件
                     utils.sendEmailError(email);
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ERROR"); // 返回状态码500和文本"ERROR"
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ERROR");
                 }
+
+                // 更新订单信息
+                Order_ order = new Order_();
+                order.setProductId(product.getGptKey());
+                order.setStatus("1");
+                order.setTradeStatus(code);
+                order.setTradeNo(map.get("order_no"));
+                orderService.update(order, new UpdateWrapper<Order_>().eq("out_trade_no", outTradeNo));
+
+                // 扣减库存
+                boolean updateCount = categoryService.update(new UpdateWrapper<Category>()
+                        .eq("id", product.getCategoryId())
+                        .setSql("stock = stock - 1"));
+                if (!updateCount) {
+                    throw new RuntimeException("库存扣减失败");
+                }
+
+                // 删除商品
+                productService.removeById(product.getId());
+
+                // 发送支付成功的邮件
+                try {
+                    utils.sendEmail(email, product.getGptKey());
+                } catch (Exception e) {
+                    log.error("邮件发送失败：", e);
+                    // 可根据业务需求决定是否需要回滚事务
+                }
+
+                return ResponseEntity.ok("SUCCESS");
             } else {
-                utils.sendEmailError(email);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ERROR"); // 返回状态码500和文本"ERROR"
+                // **支付失败的处理**
+
+                // 记录支付失败的订单信息
+                Order_ order = new Order_();
+                order.setStatus("0");
+                order.setTradeStatus(code);
+                order.setTradeNo(map.get("order_no"));
+                orderService.update(order, new UpdateWrapper<Order_>().eq("out_trade_no", outTradeNo));
+
+                // 发送支付失败的邮件
+                try {
+                    utils.sendEmailError(email);
+                } catch (Exception e) {
+                    log.error("邮件发送失败：", e);
+                    // 可根据业务需求决定是否需要特殊处理
+                }
+
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ERROR");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("支付回调处理异常：", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ERROR");
         }
-        return ResponseEntity.ok("SUCCESS"); // 返回状态码200和文本"SUCCESS"
     }
 }
